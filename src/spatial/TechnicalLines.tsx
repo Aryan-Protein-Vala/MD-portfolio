@@ -5,113 +5,88 @@ import { Line } from '@react-three/drei';
 
 /**
  * Renders the continuous 3D architectural construction lines, diagonal perspective vectors,
- * and spatial datum axes connecting all chapters from Z=+16 to Z=-200.
- * Matches the bold diagonal construction lines and vertical plumb lines in the reference video.
+ * horizontal station datum lines, and small black registration rectangles across the entire
+ * laid-out drafting map (from Y = +8 down to Y = -86).
  */
 export const TechnicalLines: React.FC = () => {
-  const { primaryDiagonals, corridorRails, datumCrossbars, accentBlocks } =
+  const { primaryDiagonals, verticalColumns, horizontalDatums, accentBlocks } =
     useMemo(() => {
+      // Long diagonal architectural axes cutting across the drafting board (matching 00:00–00:03 of reference video)
       const diagonals: [number, number, number][][] = [
-        // Signature diagonal perspective axes cutting across the composition (matching 00:00–00:03)
         [
-          [-14, -8, 6],
-          [14, 9, -24],
+          [-10, 6, 1.5],
+          [11, -12, -1.5],
         ],
         [
-          [-12, 8, 4],
-          [16, -7, -28],
+          [6, 7, 1.0],
+          [-9, -14, -1.5],
         ],
         [
-          [4, 10, 8],
-          [12, -9, -18],
-        ],
-        // Deep corridor diagonal trajectories connecting chapters
-        [
-          [-12, 6, -15],
-          [12, -5, -58],
+          [-9, -6, 0.5],
+          [10, -28, -1.8],
         ],
         [
-          [12, 5, -45],
-          [-12, -6, -88],
+          [9, -18, 0.5],
+          [-10, -42, -1.8],
         ],
         [
-          [-11, 6, -82],
-          [11, -5, -135],
+          [-9, -32, 0.5],
+          [10, -56, -1.8],
         ],
         [
-          [12, 6, -128],
-          [-12, -6, -175],
+          [9, -46, 0.5],
+          [-10, -70, -1.8],
         ],
         [
-          [-10, -5, -160],
-          [10, 5, -198],
+          [-9, -60, 0.5],
+          [10, -84, -1.8],
         ],
       ];
 
-      // Continuous Z-axis architectural datum rails
-      const rails: [number, number, number][][] = [
+      // Continuous vertical plumb lines running the full length of the architectural map
+      const verticals: [number, number, number][][] = [
         [
-          [-8.5, 4.5, 16],
-          [-8.5, 4.5, -200],
+          [-6.2, 8, -1.0],
+          [-6.2, -86, -1.0],
         ],
         [
-          [8.5, 4.5, 16],
-          [8.5, 4.5, -200],
+          [-2.4, 8, -1.2],
+          [-2.4, -86, -1.2],
         ],
         [
-          [-8.5, -4.5, 16],
-          [-8.5, -4.5, -200],
+          [2.4, 8, -1.2],
+          [2.4, -86, -1.2],
         ],
         [
-          [8.5, -4.5, 16],
-          [8.5, -4.5, -200],
-        ],
-        [
-          [0, -4.5, 16],
-          [0, -4.5, -200],
+          [6.2, 8, -1.0],
+          [6.2, -86, -1.0],
         ],
       ];
 
-      // Crossbar frames every 14 units in Z
-      const crossbars: [number, number, number][][] = [];
-      for (let z = 10; z >= -196; z -= 14) {
-        crossbars.push(
-          [
-            [-11, 0, z],
-            [11, 0, z],
-          ],
-          [
-            [0, -6.5, z],
-            [0, 6.5, z],
-          ],
-          [
-            [-8.5, -4.5, z],
-            [8.5, -4.5, z],
-            [8.5, 4.5, z],
-            [-8.5, 4.5, z],
-            [-8.5, -4.5, z],
-          ]
+      // Horizontal station datum lines every 4 units down the map
+      const horizontals: [number, number, number][][] = [];
+      for (let y = 4; y >= -84; y -= 4) {
+        horizontals.push([
+          [-12, y, -1.2],
+          [12, y, -1.2],
+        ]);
+      }
+
+      // Small solid black registration rectangles scattered along the construction lines (matching reference video)
+      const blocks: { pos: [number, number, number]; size: [number, number] }[] = [];
+      for (let i = 0; i < 12; i++) {
+        const y = 1.5 - i * 7.2;
+        blocks.push(
+          { pos: [-4.6, y, 0.5], size: [0.12, 0.28] },
+          { pos: [4.8, y - 2.4, 0.2], size: [0.1, 0.42] },
+          { pos: [-1.8, y - 3.8, 0.4], size: [0.22, 0.1] }
         );
       }
 
-      // Small black architectural registration rectangles scattered in 3D space (matching reference video markers)
-      const blocks: { pos: [number, number, number]; size: [number, number] }[] = [
-        { pos: [-4.8, 1.3, 2.0], size: [0.16, 0.28] },
-        { pos: [4.6, 0.4, -1.5], size: [0.14, 0.45] },
-        { pos: [-3.2, -1.4, -18.0], size: [0.22, 0.14] },
-        { pos: [3.8, 1.9, -24.0], size: [0.15, 0.35] },
-        { pos: [-4.5, 2.1, -48.0], size: [0.18, 0.3] },
-        { pos: [4.9, -1.2, -62.0], size: [0.24, 0.16] },
-        { pos: [-3.9, 1.5, -94.0], size: [0.16, 0.36] },
-        { pos: [4.4, -1.4, -110.0], size: [0.2, 0.28] },
-        { pos: [-4.2, 1.8, -142.0], size: [0.18, 0.32] },
-        { pos: [3.6, -1.5, -166.0], size: [0.22, 0.18] },
-      ];
-
       return {
         primaryDiagonals: diagonals,
-        corridorRails: rails,
-        datumCrossbars: crossbars,
+        verticalColumns: verticals,
+        horizontalDatums: horizontals,
         accentBlocks: blocks,
       };
     }, []);
@@ -123,31 +98,31 @@ export const TechnicalLines: React.FC = () => {
           key={`diag-${idx}`}
           points={pts}
           color="#141413"
-          lineWidth={1.35}
+          lineWidth={1.25}
           transparent
-          opacity={0.48}
+          opacity={0.42}
         />
       ))}
 
-      {corridorRails.map((pts, idx) => (
+      {verticalColumns.map((pts, idx) => (
         <Line
-          key={`rail-${idx}`}
+          key={`vert-${idx}`}
           points={pts}
           color="#141413"
-          lineWidth={0.75}
+          lineWidth={0.7}
           transparent
-          opacity={0.18}
+          opacity={0.16}
         />
       ))}
 
-      {datumCrossbars.map((pts, idx) => (
+      {horizontalDatums.map((pts, idx) => (
         <Line
-          key={`cross-${idx}`}
+          key={`horiz-${idx}`}
           points={pts}
           color="#141413"
           lineWidth={0.6}
           transparent
-          opacity={0.13}
+          opacity={0.14}
         />
       ))}
 

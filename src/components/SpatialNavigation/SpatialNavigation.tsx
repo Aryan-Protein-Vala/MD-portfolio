@@ -19,6 +19,11 @@ interface SpatialNavigationProps {
   onNavigateToProgress: (targetProgress: number) => void;
 }
 
+/**
+ * Ultra-clean, restrained architectural HUD top strip.
+ * Preserves open warm-ivory paper space at the top of the viewport just like the reference video,
+ * using tiny technical annotations (AXIS.0X, AWWWARDS / EDITION 2026) and a compact chapter selector.
+ */
 export const SpatialNavigation: React.FC<SpatialNavigationProps> = ({
   activeChapterIndex,
   masterProgress,
@@ -28,101 +33,82 @@ export const SpatialNavigation: React.FC<SpatialNavigationProps> = ({
   onNavigateToProgress,
 }) => {
   return (
-    <header className="fixed top-0 left-0 right-0 z-50 pointer-events-none">
-      {/* Top architectural datum bar */}
-      <div className="mx-auto flex flex-wrap items-center justify-between border-b border-ink/15 bg-ivory/80 backdrop-blur-md px-4 py-2.5 md:px-8 pointer-events-auto">
-        {/* Brand / Exhibition Identifier */}
-        <div className="flex items-center gap-4">
+    <header className="fixed top-0 left-0 right-0 z-50 pointer-events-none px-5 sm:px-10 pt-4">
+      <div className="flex flex-wrap items-start justify-between gap-4">
+        {/* Top-left technical axis label (matching "AXIS.03" in top-left of reference video) */}
+        <div className="pointer-events-auto flex items-center gap-6">
           <button
             type="button"
             onClick={() => onNavigateToProgress(0)}
-            className="text-left group cursor-pointer py-1"
-            aria-label="Return to Chapter 00 Exhibition Entry"
+            className="text-left group cursor-pointer"
+            aria-label="Return to Origin"
           >
-            <div className="flex items-center gap-2">
-              <span className="inline-block w-2 h-2 bg-ink" />
-              <span className="font-mono text-[11px] font-semibold tracking-[0.18em] text-ink">
-                ARYAN SHARMA // SPATIAL MONOGRAPH
-              </span>
+            <div className="font-mono text-[10px] font-semibold tracking-[0.2em] text-ink uppercase">
+              AXIS.0{activeChapterIndex} // ARYAN SHARMA
             </div>
-            <div className="font-mono text-[9px] tracking-[0.16em] text-ink-subtle hidden sm:block">
-              {telemetry.chapterCode} — {telemetry.subtitle}
+            <div className="font-mono text-[9px] tracking-[0.16em] text-ink-subtle uppercase mt-0.5">
+              {telemetry.subtitle}
             </div>
           </button>
         </div>
 
-        {/* Chapter Index Buttons */}
+        {/* Center-top compact chapter index strip */}
         <nav
-          aria-label="Exhibition Chapters"
-          className="flex items-center gap-1 overflow-x-auto max-w-full py-1"
+          aria-label="Architectural Plan Chapters"
+          className="pointer-events-auto flex items-center gap-1 bg-ivory/75 backdrop-blur-sm border border-ink/15 px-1.5 py-1"
         >
           {CHAPTER_NAVIGATION.map((item) => {
             const isActive = activeChapterIndex === item.chapterIndex;
             return (
-              <div key={item.code} className="relative flex items-center">
-                <button
-                  type="button"
-                  onClick={() => onNavigateToProgress(item.targetProgress)}
-                  className={`min-h-[34px] px-2.5 py-1 font-mono text-[10px] tracking-[0.14em] uppercase transition-colors border ${
-                    isActive
-                      ? 'bg-ink text-ivory border-ink font-semibold'
-                      : 'bg-transparent text-ink-muted border-transparent hover:border-ink/30 hover:text-ink'
-                  }`}
-                  aria-current={isActive ? 'step' : undefined}
-                >
-                  <span className="opacity-65 mr-1">{item.code}/</span>
-                  <span>{item.shortTitle}</span>
-                </button>
-              </div>
+              <button
+                key={item.code}
+                type="button"
+                onClick={() => onNavigateToProgress(item.targetProgress)}
+                className={`px-2 py-1 font-mono text-[9px] tracking-[0.16em] uppercase transition-colors ${
+                  isActive
+                    ? 'bg-ink text-ivory font-semibold'
+                    : 'text-ink-muted hover:text-ink'
+                }`}
+                aria-current={isActive ? 'step' : undefined}
+              >
+                {item.code}
+                <span className="hidden md:inline ml-1">/{item.shortTitle}</span>
+              </button>
             );
           })}
         </nav>
 
-        {/* Camera Telemetry & Motion Mode Toggle */}
-        <div className="hidden xl:flex items-center gap-5 font-mono text-[10px] tracking-[0.14em] text-ink-muted">
-          <div className="flex items-center gap-3 border-l border-ink/15 pl-4">
-            <span>CAM.X: {telemetry.x.toFixed(1)}</span>
-            <span>CAM.Y: {telemetry.y.toFixed(1)}</span>
-            <span>CAM.Z: {telemetry.z.toFixed(1)}</span>
-            <span>FOV: {telemetry.fov}°</span>
-          </div>
+        {/* Top-right sub-stops (for Experience & Projects) + Motion toggle */}
+        <div className="pointer-events-auto hidden lg:flex items-center gap-2">
+          {(activeChapterIndex === 2 || activeChapterIndex === 3) &&
+            CHAPTER_NAVIGATION[activeChapterIndex]?.subStops?.map((stop) => {
+              const isNear = Math.abs(masterProgress - stop.progress) < 0.045;
+              return (
+                <button
+                  key={stop.label}
+                  type="button"
+                  onClick={() => onNavigateToProgress(stop.progress)}
+                  className={`px-2 py-1 font-mono text-[9px] tracking-[0.14em] uppercase border transition-colors ${
+                    isNear
+                      ? 'bg-ink text-ivory border-ink'
+                      : 'bg-ivory/60 text-ink-muted border-ink/20 hover:border-ink hover:text-ink'
+                  }`}
+                >
+                  {stop.label}
+                </button>
+              );
+            })}
+
           <button
             type="button"
             onClick={onToggleReducedMotion}
-            className="min-h-[32px] px-2.5 py-1 border border-ink/25 text-ink hover:bg-ink hover:text-ivory transition-colors uppercase text-[10px] tracking-[0.14em]"
+            className="px-2.5 py-1 border border-ink/20 bg-ivory/70 font-mono text-[9px] tracking-[0.15em] text-ink-muted hover:text-ink uppercase"
             aria-pressed={reducedMotion}
-            title="Toggle camera motion or static architectural reader mode"
           >
-            MOTION: {reducedMotion ? 'STATIC' : 'SPATIAL 3D'}
+            {reducedMotion ? 'PLAN: FLAT' : 'PLAN: 3D'}
           </button>
         </div>
       </div>
-
-      {/* Sub-navigation bar when in Experience (Ch 02) or Selected Work (Ch 03) */}
-      {(activeChapterIndex === 2 || activeChapterIndex === 3) && (
-        <div className="flex items-center justify-center md:justify-end gap-2 px-4 md:px-8 py-1.5 bg-ivory-light/75 border-b border-ink/10 backdrop-blur-sm pointer-events-auto">
-          <span className="font-mono text-[9px] tracking-[0.18em] text-ink-subtle uppercase mr-2">
-            INSTALLATION STOPS:
-          </span>
-          {CHAPTER_NAVIGATION[activeChapterIndex]?.subStops?.map((stop) => {
-            const isNear = Math.abs(masterProgress - stop.progress) < 0.048;
-            return (
-              <button
-                key={stop.label}
-                type="button"
-                onClick={() => onNavigateToProgress(stop.progress)}
-                className={`min-h-[28px] px-2.5 py-0.5 font-mono text-[10px] tracking-[0.14em] uppercase border transition-colors ${
-                  isNear
-                    ? 'bg-ink text-ivory border-ink'
-                    : 'bg-ivory/70 text-ink-muted border-ink/20 hover:border-ink hover:text-ink'
-                }`}
-              >
-                {stop.label}
-              </button>
-            );
-          })}
-        </div>
-      )}
     </header>
   );
 };

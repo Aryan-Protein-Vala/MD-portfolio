@@ -12,18 +12,18 @@ interface BlueprintFloorPlanProps {
 }
 
 /**
- * Renders 3D architectural floor plans, elevation grids, and CAD construction blueprints
- * directly in the Three.js scene, matching the floor plans & grid cards in the reference video.
+ * 3D Architectural Floor Plans, Millimeter Grid Sheets & Section Elevations
+ * Laid out flat/angled along the continuous vertical & diagonal drafting map (Y: +3 to -82).
  */
 export const BlueprintFloorPlan: React.FC<BlueprintFloorPlanProps> = ({
   position,
-  rotation = [0, 0, 0],
+  rotation = [-0.14, 0, -0.02],
   scale = 1,
   variant = 'architectural-plan',
 }) => {
   const { outerFrame, innerLines, gridLines } = useMemo(() => {
-    const w = 4.6 * scale;
-    const h = 3.2 * scale;
+    const w = 4.4 * scale;
+    const h = 3.1 * scale;
     const hw = w / 2;
     const hh = h / 2;
 
@@ -36,8 +36,8 @@ export const BlueprintFloorPlan: React.FC<BlueprintFloorPlanProps> = ({
     ];
 
     const grid: [number, number, number][][] = [];
-    const cols = variant === 'grid-matrix' ? 14 : 8;
-    const rows = variant === 'grid-matrix' ? 10 : 6;
+    const cols = variant === 'grid-matrix' ? 16 : 8;
+    const rows = variant === 'grid-matrix' ? 12 : 6;
 
     for (let i = 1; i < cols; i++) {
       const x = -hw + (w / cols) * i;
@@ -56,47 +56,50 @@ export const BlueprintFloorPlan: React.FC<BlueprintFloorPlanProps> = ({
 
     const inner: [number, number, number][][] = [];
     if (variant === 'architectural-plan') {
-      // Interior architectural room partitions, doorways, and structural columns
+      // Detailed architectural floor plan walls, doorways & room divisions (matching 00:01–00:02 right side of reference video)
       inner.push(
         [
-          [-hw * 0.85, -hh * 0.82, 0.01],
-          [hw * 0.85, -hh * 0.82, 0.01],
-          [hw * 0.85, hh * 0.82, 0.01],
-          [-hw * 0.85, hh * 0.82, 0.01],
-          [-hw * 0.85, -hh * 0.82, 0.01],
+          [-hw * 0.84, -hh * 0.8, 0.01],
+          [hw * 0.84, -hh * 0.8, 0.01],
+          [hw * 0.84, hh * 0.8, 0.01],
+          [-hw * 0.84, hh * 0.8, 0.01],
+          [-hw * 0.84, -hh * 0.8, 0.01],
         ],
         [
-          [-hw * 0.2, -hh * 0.82, 0.01],
-          [-hw * 0.2, hh * 0.82, 0.01],
+          [-hw * 0.18, -hh * 0.8, 0.01],
+          [-hw * 0.18, hh * 0.8, 0.01],
         ],
         [
-          [hw * 0.32, -hh * 0.82, 0.01],
-          [hw * 0.32, hh * 0.35, 0.01],
+          [hw * 0.3, -hh * 0.8, 0.01],
+          [hw * 0.3, hh * 0.35, 0.01],
         ],
         [
-          [-hw * 0.85, hh * 0.12, 0.01],
-          [hw * 0.85, hh * 0.12, 0.01],
+          [-hw * 0.84, hh * 0.15, 0.01],
+          [hw * 0.84, hh * 0.15, 0.01],
         ],
         [
-          [-hw * 0.85, -hh * 0.32, 0.01],
-          [-hw * 0.2, -hh * 0.32, 0.01],
+          [-hw * 0.84, -hh * 0.3, 0.01],
+          [-hw * 0.18, -hh * 0.3, 0.01],
+        ],
+        [
+          [hw * 0.3, -hh * 0.25, 0.01],
+          [hw * 0.84, -hh * 0.25, 0.01],
         ]
       );
     } else if (variant === 'section-elevation') {
-      // Structural elevation truss and datum diagonals
       inner.push(
         [
           [-hw, -hh, 0.01],
           [hw, hh, 0.01],
         ],
         [
-          [-hw, hh * 0.4, 0.01],
-          [hw, hh * 0.4, 0.01],
+          [-hw, hh * 0.35, 0.01],
+          [hw, hh * 0.35, 0.01],
         ],
         [
-          [-hw * 0.5, -hh, 0.01],
-          [0, hh * 0.4, 0.01],
-          [hw * 0.5, -hh, 0.01],
+          [-hw * 0.45, -hh, 0.01],
+          [0, hh * 0.35, 0.01],
+          [hw * 0.45, -hh, 0.01],
         ]
       );
     }
@@ -106,18 +109,16 @@ export const BlueprintFloorPlan: React.FC<BlueprintFloorPlanProps> = ({
 
   return (
     <group position={position} rotation={new THREE.Euler(...rotation)}>
-      {/* Paper backing plane */}
       <mesh position={[0, 0, -0.02]}>
-        <planeGeometry args={[4.6 * scale, 3.2 * scale]} />
+        <planeGeometry args={[4.4 * scale, 3.1 * scale]} />
         <meshBasicMaterial
-          color="#EFECE6"
+          color="#EAE5DC"
           transparent
-          opacity={0.76}
+          opacity={0.72}
           side={THREE.DoubleSide}
         />
       </mesh>
 
-      {/* Fine grid lines */}
       {gridLines.map((pts, idx) => (
         <Line
           key={`grid-${idx}`}
@@ -129,25 +130,23 @@ export const BlueprintFloorPlan: React.FC<BlueprintFloorPlanProps> = ({
         />
       ))}
 
-      {/* Inner architectural walls / structural partitions */}
       {innerLines.map((pts, idx) => (
         <Line
           key={`inner-${idx}`}
           points={pts}
           color="#141413"
-          lineWidth={1.25}
+          lineWidth={1.15}
           transparent
-          opacity={0.52}
+          opacity={0.48}
         />
       ))}
 
-      {/* Outer crisp border */}
       <Line
         points={outerFrame}
         color="#141413"
-        lineWidth={1.1}
+        lineWidth={1.0}
         transparent
-        opacity={0.42}
+        opacity={0.38}
       />
     </group>
   );
@@ -156,100 +155,93 @@ export const BlueprintFloorPlan: React.FC<BlueprintFloorPlanProps> = ({
 export const BlueprintLayer: React.FC = () => {
   const plans = useMemo(
     () => [
-      // Chapter 00 & 01 architectural floor plans and grid sheets (matching 00:00–00:02 of reference video)
+      // Stop 00: Intro (millimeter grid sheet top-right + architectural floor plan bottom-right, matching 00:00–00:01)
       {
-        pos: [2.8, 1.3, -2.5] as [number, number, number],
-        rot: [0, -0.08, 0] as [number, number, number],
+        pos: [2.1, 1.5, -0.8] as [number, number, number],
+        rot: [-0.14, -0.04, -0.015] as [number, number, number],
+        scale: 0.78,
+        variant: 'grid-matrix' as const,
+      },
+      {
+        pos: [4.5, -2.8, -1.5] as [number, number, number],
+        rot: [-0.14, -0.05, -0.02] as [number, number, number],
+        scale: 0.88,
+        variant: 'architectural-plan' as const,
+      },
+      // Stop 01: Identity (Y = -7.5)
+      {
+        pos: [4.4, -6.8, -2.2] as [number, number, number],
+        rot: [-0.14, -0.04, -0.015] as [number, number, number],
+        scale: 0.9,
+        variant: 'architectural-plan' as const,
+      },
+      {
+        pos: [-4.6, -9.2, -2.8] as [number, number, number],
+        rot: [-0.14, 0.04, 0.015] as [number, number, number],
+        scale: 0.76,
+        variant: 'grid-matrix' as const,
+      },
+      // Stop 02.A: Cinntra (Y = -15.5)
+      {
+        pos: [4.2, -14.8, -2.2] as [number, number, number],
+        rot: [-0.14, -0.05, -0.02] as [number, number, number],
+        scale: 0.88,
+        variant: 'section-elevation' as const,
+      },
+      // Stop 02.B: Niswa (Y = -23.5)
+      {
+        pos: [-4.2, -22.8, -2.4] as [number, number, number],
+        rot: [-0.14, 0.05, 0.02] as [number, number, number],
+        scale: 0.9,
+        variant: 'architectural-plan' as const,
+      },
+      // Stop 02.C: Sudarshana (Y = -31.5)
+      {
+        pos: [4.4, -30.8, -2.2] as [number, number, number],
+        rot: [-0.14, -0.04, -0.015] as [number, number, number],
+        scale: 0.86,
+        variant: 'grid-matrix' as const,
+      },
+      // Stop 03.A: Prometheus (Y = -39.5)
+      {
+        pos: [-4.5, -38.8, -2.5] as [number, number, number],
+        rot: [-0.14, 0.05, 0.015] as [number, number, number],
+        scale: 0.92,
+        variant: 'architectural-plan' as const,
+      },
+      // Stop 03.B: Aether (Y = -47.5)
+      {
+        pos: [4.3, -46.8, -2.6] as [number, number, number],
+        rot: [-0.14, -0.04, -0.02] as [number, number, number],
+        scale: 0.9,
+        variant: 'grid-matrix' as const,
+      },
+      // Stop 03.C: Astral Network (Y = -55.5)
+      {
+        pos: [-4.4, -54.8, -2.4] as [number, number, number],
+        rot: [-0.14, 0.04, 0.015] as [number, number, number],
+        scale: 0.88,
+        variant: 'section-elevation' as const,
+      },
+      // Stop 04: Technical Map (Y = -63.5)
+      {
+        pos: [4.6, -62.8, -2.6] as [number, number, number],
+        rot: [-0.14, -0.03, -0.01] as [number, number, number],
         scale: 0.95,
         variant: 'grid-matrix' as const,
       },
+      // Stop 05: Beyond the Screen (Y = -71.5)
       {
-        pos: [5.4, -0.6, -6.5] as [number, number, number],
-        rot: [0, -0.12, 0] as [number, number, number],
-        scale: 1.05,
+        pos: [-4.4, -70.8, -2.4] as [number, number, number],
+        rot: [-0.14, 0.04, 0.015] as [number, number, number],
+        scale: 0.88,
         variant: 'architectural-plan' as const,
       },
+      // Stop 06: Contact (Y = -79.2)
       {
-        pos: [-5.8, 2.2, -10.0] as [number, number, number],
-        rot: [0, 0.08, 0] as [number, number, number],
-        scale: 0.9,
-        variant: 'section-elevation' as const,
-      },
-      // Chapter 01 Identity planes
-      {
-        pos: [4.2, 1.6, -26.0] as [number, number, number],
-        rot: [0, -0.15, 0] as [number, number, number],
-        scale: 1.1,
-        variant: 'architectural-plan' as const,
-      },
-      {
-        pos: [-6.4, -1.8, -31.0] as [number, number, number],
-        rot: [0, 0.1, 0] as [number, number, number],
-        scale: 0.85,
-        variant: 'grid-matrix' as const,
-      },
-      // Chapter 02 Experience planes
-      {
-        pos: [-6.2, 1.8, -54.0] as [number, number, number],
-        rot: [0, 0.14, 0] as [number, number, number],
-        scale: 1.15,
-        variant: 'section-elevation' as const,
-      },
-      {
-        pos: [6.4, -0.4, -68.0] as [number, number, number],
-        rot: [0, -0.14, 0] as [number, number, number],
-        scale: 1.1,
-        variant: 'architectural-plan' as const,
-      },
-      {
-        pos: [-5.6, -1.5, -82.0] as [number, number, number],
-        rot: [0, 0.12, 0] as [number, number, number],
+        pos: [3.8, -78.8, -2.5] as [number, number, number],
+        rot: [-0.12, -0.02, 0] as [number, number, number],
         scale: 1.0,
-        variant: 'grid-matrix' as const,
-      },
-      // Chapter 03 Projects planes
-      {
-        pos: [-6.0, 1.4, -100.0] as [number, number, number],
-        rot: [0, 0.16, 0] as [number, number, number],
-        scale: 1.2,
-        variant: 'architectural-plan' as const,
-      },
-      {
-        pos: [6.2, 0.8, -116.0] as [number, number, number],
-        rot: [0, -0.16, 0] as [number, number, number],
-        scale: 1.15,
-        variant: 'grid-matrix' as const,
-      },
-      {
-        pos: [-5.8, -1.1, -132.0] as [number, number, number],
-        rot: [0, 0.14, 0] as [number, number, number],
-        scale: 1.1,
-        variant: 'section-elevation' as const,
-      },
-      // Chapter 04 Technical Universe planes
-      {
-        pos: [-6.8, 2.4, -148.0] as [number, number, number],
-        rot: [0, 0.1, 0] as [number, number, number],
-        scale: 1.2,
-        variant: 'grid-matrix' as const,
-      },
-      {
-        pos: [6.8, -2.0, -154.0] as [number, number, number],
-        rot: [0, -0.1, 0] as [number, number, number],
-        scale: 1.2,
-        variant: 'architectural-plan' as const,
-      },
-      // Chapter 05 & 06
-      {
-        pos: [-5.4, 1.8, -170.0] as [number, number, number],
-        rot: [0, 0.12, 0] as [number, number, number],
-        scale: 1.0,
-        variant: 'section-elevation' as const,
-      },
-      {
-        pos: [0.0, 0.0, -195.0] as [number, number, number],
-        rot: [0, 0, 0] as [number, number, number],
-        scale: 1.6,
         variant: 'architectural-plan' as const,
       },
     ],

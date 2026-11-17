@@ -1,7 +1,7 @@
 'use client';
 
 import React from 'react';
-import { computeSpatialPlaneMetrics } from '@/animation/SceneTransitions';
+import { computeSpatialPlaneMetrics, SpatialPlaneMetrics } from '@/animation/SceneTransitions';
 import { computeLayerParallax } from '@/animation/ParallaxController';
 
 interface SpatialPanelProps {
@@ -15,13 +15,15 @@ interface SpatialPanelProps {
   className?: string;
   id?: string;
   ariaLabel?: string;
-  children: React.ReactNode;
+  children:
+    | React.ReactNode
+    | ((metrics: SpatialPlaneMetrics) => React.ReactNode);
 }
 
 /**
- * Hybrid DOM Spatial Wrapper that synchronizes HTML content panels with the 3D camera journey.
- * Applies continuous 3D perspective transforms, parallax, and depth-of-field blur while remaining
- * sharp, accessible, and responsive across desktop (1440px+) and mobile (390px) viewports.
+ * Places each chapter on the continuous 3D tilted Architectural Drafting Map.
+ * As the visitor scrolls, outgoing chapters physically travel UPWARD (-Y) and scale past the top edge of the camera,
+ * while incoming chapters rise from the lower drafting map (+Y), matching the reference video (00:00 -> 00:03).
  */
 export const SpatialPanel: React.FC<SpatialPanelProps> = ({
   anchorProgress,
@@ -50,11 +52,15 @@ export const SpatialPanel: React.FC<SpatialPanelProps> = ({
     reducedMotion
   );
 
-  const tx = metrics.translateX + parallax.x;
-  const ty = metrics.translateY + parallax.y;
+  // Only allow clicks on the station currently in focus
+  const isInteractive = Math.abs(metrics.relativeProgress) <= 0.36;
 
-  // Enable pointer events when chapter is in or near the active focal window
-  const isInteractive = Math.abs(metrics.relativeProgress) <= 0.58;
+  // Higher z-index for outgoing title at top edge, active station in middle, incoming lower on map
+  const zIndex = isInteractive
+    ? 30
+    : metrics.relativeProgress > 0
+      ? 35
+      : 15;
 
   return (
     <section
@@ -64,18 +70,19 @@ export const SpatialPanel: React.FC<SpatialPanelProps> = ({
         opacity: metrics.opacity,
         transform: reducedMotion
           ? 'none'
-          : `perspective(1200px) translate3d(${tx.toFixed(1)}px, ${ty.toFixed(1)}px, ${metrics.translateZ.toFixed(1)}px) scale(${metrics.scale})`,
+          : `perspective(1400px) translate3d(calc(${metrics.translateX}vw + ${parallax.x}px), calc(${metrics.translateY}vh + ${parallax.y}px), ${metrics.translateZ}px) rotateX(${metrics.rotateX}deg) rotateY(${metrics.rotateY}deg) rotateZ(${metrics.rotateZ}deg) scale(${metrics.scale})`,
+        transformOrigin: '50% 45%',
         filter:
-          metrics.blurPx > 0.25 && !reducedMotion
+          metrics.blurPx > 0.2 && !reducedMotion
             ? `blur(${metrics.blurPx}px)`
             : 'none',
         pointerEvents: isInteractive ? 'auto' : 'none',
         visibility: metrics.isVisible ? 'visible' : 'hidden',
-        zIndex: isInteractive ? 35 : 15,
+        zIndex,
       }}
-      className={`fixed inset-0 flex items-center justify-center overflow-y-auto overflow-x-hidden transition-opacity duration-150 will-change-transform ${className}`}
+      className={`fixed inset-0 flex items-center justify-center overflow-hidden will-change-transform ${className}`}
     >
-      {children}
+      {typeof children === 'function' ? children(metrics) : children}
     </section>
   );
 };

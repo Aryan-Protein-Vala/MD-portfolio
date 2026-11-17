@@ -3,7 +3,6 @@
 import React from 'react';
 import { profileData } from '@/data/profile';
 import { SpatialPanel } from '@/spatial/SpatialPanel';
-import { computeKineticTitleStyle } from '@/animation/TypographyMotion';
 import { GlassPanel } from '@/spatial/GlassPanel';
 
 interface ExplorationSceneProps {
@@ -17,17 +16,14 @@ export const ExplorationScene3D: React.FC<{ reducedMotion: boolean }> = ({
   reducedMotion,
 }) => {
   return (
-    <group name="chapter-05-exploration-3d">
-      {profileData.explorations.items.map((item, idx) => (
-        <GlassPanel
-          key={item.id}
-          position={item.coordinates}
-          size={[3.6, 2.2, 0.07]}
-          rotation={[0, idx % 2 === 0 ? 0.14 : -0.14, 0]}
-          opacity={0.32}
-          reducedMotion={reducedMotion}
-        />
-      ))}
+    <group name="chapter-05-exploration-3d" position={[0.4, -71.5, -1.8]}>
+      <GlassPanel
+        position={[-2.8, 0.5, 0.9]}
+        size={[3.8, 2.2, 0.07]}
+        rotation={[-0.12, 0.05, 0]}
+        opacity={0.28}
+        reducedMotion={reducedMotion}
+      />
     </group>
   );
 };
@@ -39,14 +35,6 @@ export const ExplorationScene: React.FC<ExplorationSceneProps> = ({
   onNextChapter,
 }) => {
   const { explorations } = profileData;
-  const titleStyle = computeKineticTitleStyle(
-    masterProgress,
-    0.94,
-    0.08,
-    8,
-    -4,
-    reducedMotion
-  );
 
   return (
     <SpatialPanel
@@ -55,104 +43,66 @@ export const ExplorationScene: React.FC<ExplorationSceneProps> = ({
       anchorProgress={0.94}
       masterProgress={masterProgress}
       pointer={pointer}
-      activeWindow={0.065}
+      activeWindow={0.055}
       entryDirection="right"
-      parallaxDepth={1.2}
+      parallaxDepth={0.95}
       reducedMotion={reducedMotion}
     >
-      <div className="relative w-full max-w-[1440px] h-full px-5 sm:px-10 md:px-16 pt-24 pb-14 flex flex-col justify-between">
-        {/* Top Datum Bar */}
-        <div className="flex flex-wrap items-center justify-between border-b border-ink/15 pb-2">
-          <div className="flex items-center gap-3">
-            <span className="reg-crosshair" />
-            <span className="type-tech-label text-ink font-semibold">
-              {explorations.axisCode}
-            </span>
-          </div>
-          <span className="type-tech-micro">
-            THEME // {explorations.theme} — PLANE Z: -168.0m
-          </span>
-        </div>
-
-        {/* Center Experimental Spatial Composition */}
-        <div className="my-auto space-y-6">
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-end">
-            <div className="lg:col-span-7" style={titleStyle}>
-              <div className="type-tech-label">
-                {explorations.chapterNumber} / {explorations.theme}
+      {(metrics) => (
+        <div className="relative w-full max-w-[1320px] px-6 sm:px-14 md:px-20">
+          {/* Monument Header */}
+          <div className="mb-6 flex flex-wrap items-end justify-between gap-4">
+            <div>
+              <div className="font-mono text-[10px] tracking-[0.2em] text-ink-muted uppercase mb-1">
+                {explorations.axisCode} // {explorations.theme}
               </div>
-              <h2 className="type-chapter-index mt-0.5">
-                {explorations.chapterTitle}
+              <h2 className="font-display text-[clamp(2.4rem,6.2vw,6.0rem)] font-bold tracking-[-0.04em] text-ink leading-[0.88] uppercase">
+                05 /
+                <br />
+                BEYOND THE SCREEN
               </h2>
             </div>
-            <div className="lg:col-span-5">
-              <p className="type-body-copy text-ink-secondary">
-                {explorations.intro}
-              </p>
-            </div>
+
+            <button
+              type="button"
+              style={{ opacity: metrics.bodyOpacity }}
+              onClick={onNextChapter}
+              className="arch-interactive-btn"
+            >
+              <span>06 / CONTACT</span>
+              <span className="btn-arrow">↓</span>
+            </button>
           </div>
 
-          {/* Staggered Asymmetric Exploration Artefacts */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-            {explorations.items.map((item, idx) => (
+          {/* Clean 4-Column Architectural Blueprint Strip */}
+          <div
+            style={{ opacity: metrics.bodyOpacity }}
+            className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 transition-opacity duration-150"
+          >
+            {explorations.items.map((item) => (
               <div
                 key={item.id}
-                style={{
-                  transform: reducedMotion
-                    ? 'none'
-                    : `translateY(${idx % 2 === 1 ? '14px' : '-6px'})`,
-                }}
-                className="spatial-glass-panel p-5 flex flex-col justify-between min-h-[230px]"
+                className="spatial-glass-panel p-5 flex flex-col justify-between"
               >
-                <div className="space-y-2.5">
-                  <div className="flex items-center justify-between border-b border-ink/15 pb-2">
-                    <span className="type-tech-micro text-ink font-semibold">
-                      {item.code}
-                    </span>
-                    <span className="font-mono text-[9px] px-1.5 py-0.5 bg-ink text-ivory">
-                      {item.artefactType}
-                    </span>
+                <div className="space-y-2">
+                  <div className="font-mono text-[9px] tracking-[0.16em] text-ink-muted border-b border-ink/15 pb-1.5">
+                    {item.code}
                   </div>
-
-                  <div className="type-tech-micro text-ink-muted">
-                    {item.category}
-                  </div>
-
-                  <h3 className="font-display text-lg font-bold text-ink leading-snug">
+                  <h3 className="font-display text-base font-bold text-ink">
                     {item.title}
                   </h3>
-
-                  <p className="type-body-copy text-xs text-ink-secondary leading-relaxed">
+                  <p className="type-body-copy text-xs text-ink-secondary">
                     {item.description}
                   </p>
                 </div>
-
-                <div className="pt-3 mt-3 border-t border-ink/10 flex items-center justify-between font-mono text-[10px] text-ink-muted">
-                  <span>Z: {item.coordinates[2]}m</span>
-                  <span>EDITABLE FIELD</span>
+                <div className="pt-3 mt-3 border-t border-ink/10 font-mono text-[9px] text-ink-muted uppercase">
+                  {item.category}
                 </div>
               </div>
             ))}
           </div>
-
-          <div className="flex justify-end pt-2">
-            <button
-              type="button"
-              onClick={onNextChapter}
-              className="arch-interactive-btn"
-            >
-              <span>06 / FINAL CHAPTER: CONTACT</span>
-              <span className="btn-arrow">→</span>
-            </button>
-          </div>
         </div>
-
-        {/* Bottom Architectural Footer */}
-        <div className="hidden sm:flex items-center justify-between border-t border-ink/15 pt-2 type-tech-micro">
-          <span>PERSONAL EXPLORATIONS &amp; CREATIVE TECHNOLOGY</span>
-          <span>EDITABLE IN SRC/DATA/PROFILE.TS</span>
-        </div>
-      </div>
+      )}
     </SpatialPanel>
   );
 };
