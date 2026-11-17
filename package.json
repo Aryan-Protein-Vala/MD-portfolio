@@ -1,0 +1,37 @@
+{
+  "name": "aryan-sharma-spatial-portfolio",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "dev": "BROWSERSLIST_CONFIG=./.browserslistrc next dev",
+    "build": "BROWSERSLIST_CONFIG=./.browserslistrc next build",
+    "start": "BROWSERSLIST_CONFIG=./.browserslistrc next start",
+    "lint": "BROWSERSLIST_CONFIG=./.browserslistrc next lint"
+  },
+  "browserslist": [
+    "> 0.5%",
+    "last 2 versions",
+    "not dead"
+  ],
+  "dependencies": {
+    "@react-three/drei": "^9.120.4",
+    "@react-three/fiber": "^8.17.10",
+    "clsx": "^2.1.1",
+    "gsap": "^3.12.5",
+    "lucide-react": "^0.468.0",
+    "next": "14.2.21",
+    "react": "18.3.1",
+    "react-dom": "18.3.1",
+    "three": "^0.170.0"
+  },
+  "devDependencies": {
+    "@types/node": "^20.17.10",
+    "@types/react": "18.3.18",
+    "@types/react-dom": "18.3.5",
+    "@types/three": "^0.170.0",
+    "autoprefixer": "^10.4.20",
+    "postcss": "^8.4.49",
+    "tailwindcss": "^3.4.17",
+    "typescript": "^5.7.2"
+  }
+}

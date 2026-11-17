@@ -1,0 +1,65 @@
+/* Architectural Blueprint Grids, Construction Lines & Substrate Grain */
+
+.architectural-substrate {
+  background-color: var(--bg-ivory);
+  background-image:
+    linear-gradient(to right, rgba(20, 20, 19, 0.055) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(20, 20, 19, 0.055) 1px, transparent 1px),
+    linear-gradient(to right, rgba(20, 20, 19, 0.025) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(20, 20, 19, 0.025) 1px, transparent 1px);
+  background-size:
+    120px 120px,
+    120px 120px,
+    24px 24px,
+    24px 24px;
+  background-position: center center;
+}
+
+/* Substrate paper grain (applied behind content, never blurring DOM text per Awwwards crosswalk) */
+.paper-grain-layer {
+  pointer-events: none;
+  position: fixed;
+  inset: 0;
+  z-index: 1;
+  opacity: 0.28;
+  mix-blend-mode: multiply;
+  background-image: radial-gradient(rgba(20, 20, 19, 0.12) 0.75px, transparent 0.75px);
+  background-size: 16px 16px;
+}
+
+/* Fine millimeter sub-grid used inside architectural plan cards */
+.blueprint-subgrid {
+  background-image:
+    linear-gradient(to right, rgba(20, 20, 19, 0.08) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(20, 20, 19, 0.08) 1px, transparent 1px);
+  background-size: 16px 16px;
+}
+
+/* Registration Crosshair Marker */
+.reg-crosshair {
+  position: relative;
+  width: 11px;
+  height: 11px;
+  display: inline-block;
+}
+
+.reg-crosshair::before,
+.reg-crosshair::after {
+  content: '';
+  position: absolute;
+  background-color: var(--ink-primary);
+}
+
+.reg-crosshair::before {
+  top: 5px;
+  left: 0;
+  width: 11px;
+  height: 1px;
+}
+
+.reg-crosshair::after {
+  left: 5px;
+  top: 0;
+  width: 1px;
+  height: 11px;
+}
